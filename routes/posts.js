@@ -21,6 +21,12 @@ router.get('/posts', async (req, res) => {
 // 게시글 상세 조회
 router.get('/posts/:postId', async (req, res) => {
   const { postId } = req.params;
+
+  if (postId === undefined || postId === null || postId === '') {
+    res.status(400).json({ message: '데이터 형식이 올바르지 않습니다.' });
+    return;
+  }
+
   const existsPosts = await Posts.find({ _id: postId });
   const result = existsPosts.map((val) => {
     const postData = {
@@ -56,12 +62,12 @@ router.put('/posts/:postId', async (req, res) => {
   const { postId } = req.params;
 
   const existsPosts = await Posts.find({ _id: postId });
-  const pass = existsPosts.map((e) => e.password);
-
+  const pswrd = existsPosts.map((e) => e.password);
+  console.log(pswrd);
   const { password, title, content } = req.body;
 
-  if (existsPosts.length && Number(pass) === Number(password)) {
-    await Posts.updateOne({ _id: String(postId) }, { $set: { title, content } });
+  if (existsPosts.length && Number(pswrd) === Number(password)) {
+    await Posts.updateOne({ _id: postId }, { $set: { title, content } });
     res.send('');
   }
   // return res.send('얍');
@@ -70,9 +76,12 @@ router.put('/posts/:postId', async (req, res) => {
 // 게시글 삭제
 router.delete('/posts/:postId', async (req, res) => {
   const { postId } = req.params;
-  const existsPosts = await Posts.find({ postId });
+  const { password } = req.body;
+  const existsPosts = await Posts.find({ _id: postId });
+  const pswrd = existsPosts.map((pw) => pw.password);
+  console.log(pswrd, postId);
 
-  if (existsPosts.length) {
+  if (existsPosts.length && Number(pswrd) === Number(password)) {
     await Posts.deleteOne({ _id: postId });
   }
 

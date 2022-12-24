@@ -1,5 +1,6 @@
 const express = require('express');
 const postsRouter = require('./routes/posts');
+const commentsRouter = require('./routes/comments');
 
 const connect = require('./schemas');
 
@@ -7,7 +8,7 @@ const app = express();
 const port = 3000;
 
 app.use(express.json());
-app.use('/', [postsRouter]);
+app.use('/', [postsRouter, commentsRouter]);
 
 connect();
 
