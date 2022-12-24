@@ -62,8 +62,8 @@ router.put('/posts/:postId', async (req, res) => {
   const { postId } = req.params;
 
   const existsPosts = await Posts.find({ _id: postId });
-  const pswrd = existsPosts.map((e) => e.password);
-  console.log(pswrd);
+  const pswrd = existsPosts.map((pw) => pw.password);
+
   const { password, title, content } = req.body;
 
   if (existsPosts.length && Number(pswrd) === Number(password)) {
@@ -79,7 +79,6 @@ router.delete('/posts/:postId', async (req, res) => {
   const { password } = req.body;
   const existsPosts = await Posts.find({ _id: postId });
   const pswrd = existsPosts.map((pw) => pw.password);
-  console.log(pswrd, postId);
 
   if (existsPosts.length && Number(pswrd) === Number(password)) {
     await Posts.deleteOne({ _id: postId });
