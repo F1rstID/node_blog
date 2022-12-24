@@ -17,6 +17,11 @@ const postsSchema = new mongoose.Schema({
     type: String,
     require: true,
   },
+  createAt: {
+    type: Date,
+    require: true,
+    default: new Date(),
+  },
 });
 
 module.exports = mongoose.model('Posts', postsSchema);
