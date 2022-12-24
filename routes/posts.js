@@ -67,6 +67,7 @@ router.put('/posts/:postId', async (req, res) => {
   // return res.send('얍');
 });
 
+// 게시글 삭제
 router.delete('/posts/:postId', async (req, res) => {
   const { postId } = req.params;
   const existsPosts = await Posts.find({ postId });
