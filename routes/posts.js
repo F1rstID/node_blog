@@ -72,7 +72,7 @@ router.delete('/posts/:postId', async (req, res) => {
   const existsPosts = await Posts.find({ postId });
 
   if (existsPosts.length) {
-    await Posts.deleteOne({ postId });
+    await Posts.deleteOne({ _id: postId });
   }
 
   res.send('');
