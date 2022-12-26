@@ -1,14 +1,15 @@
 const express = require('express');
-const postsRouter = require('./routes/posts');
-const commentsRouter = require('./routes/comments');
-
+const indexRouter = require('./routes/index');
 const connect = require('./schemas');
 
 const app = express();
 const port = 3000;
 
 app.use(express.json());
-app.use('/', [postsRouter, commentsRouter]);
+app.use('/', indexRouter);
+// app.use((err, req, res, next) => {
+
+// });
 
 connect();
 

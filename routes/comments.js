@@ -3,11 +3,12 @@ const Comments = require('../schemas/comments');
 
 const router = express.Router();
 
-router.post('/comments/:postId', async (req, res) => {
+router.post('/:postId', async (req, res) => {
   const { postId } = req.params;
   const {
     user, password, content,
   } = req.body;
+
   const createComments = await Comments.create({
     postId, user, password, content,
   });
@@ -16,7 +17,7 @@ router.post('/comments/:postId', async (req, res) => {
 });
 
 // 댓글 목록 조회
-router.get('/comments/:postId', async (req, res) => {
+router.get('/:postId', async (req, res) => {
   const { postId } = req.params;
   const data = await Comments.find({ postId });
   const result = data.map((v) => {
@@ -31,7 +32,7 @@ router.get('/comments/:postId', async (req, res) => {
   res.json({ data: result });
 });
 
-router.put('/comments/:commentsId', async (req, res) => {
+router.put('/:commentsId', async (req, res) => {
   const { commentsId } = req.params;
 
   const existsComments = await Comments.find({ _id: commentsId });
@@ -44,7 +45,7 @@ router.put('/comments/:commentsId', async (req, res) => {
   res.send('');
 });
 
-router.delete('/comments/:commentsId', async (req, res) => {
+router.delete('/:commentsId', async (req, res) => {
   const { commentsId } = req.params;
   const { password } = req.body;
 
