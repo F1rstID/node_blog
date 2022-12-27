@@ -13,7 +13,8 @@ router.get('/', async (req, res) => {
       createdAt: row.createdAt,
     };
     return postData;
-  });
+  }).sort((a, b) => b.createdAt - a.createdAt);
+
   res.status(200).json({ data: result });
 });
 

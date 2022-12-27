@@ -40,7 +40,7 @@ router.get('/:postId', async (req, res) => {
         createdAt: row.createdAt,
       };
       return commentData;
-    });
+    }).sort((a, b) => b.createdAt - a.createdAt);
     res.status(200).json({ data: result });
   } catch {
     res.status(400).json({ message: '데이터 형식이 올바르지 않습니다.' });
