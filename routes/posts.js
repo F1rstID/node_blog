@@ -5,43 +5,38 @@ const router = express.Router();
 // 게시글 조회
 router.get('/', async (req, res) => {
   const data = await Posts.find();
-  const result = data.map((v) => {
+  const result = data.map((row) => {
     const postData = {
-      // eslint-disable-next-line no-underscore-dangle
-      postid: v._id,
-      user: v.user,
-      title: v.title,
-      createAt: v.createAt,
+      postid: row.id,
+      user: row.user,
+      title: row.title,
+      createdAt: row.createdAt,
     };
     return postData;
   });
-  res.json({ data: result });
+  res.status(200).json({ data: result });
 });
 
 // 게시글 상세 조회
 router.get('/:postId', async (req, res) => {
   const { postId } = req.params;
-
-  if (postId === undefined || postId === null || postId === '') {
+  try {
+    const existsPosts = await Posts.find({ _id: postId });
+    const result = existsPosts.map((row) => {
+      const postData = {
+        postId: row.id,
+        user: row.user,
+        title: row.title,
+        content: row.content,
+        createdAt: row.createdAt,
+      };
+      return postData;
+    });
+    if (existsPosts.length) {
+      res.status(200).json({ data: result });
+    }
+  } catch {
     res.status(400).json({ message: '데이터 형식이 올바르지 않습니다.' });
-    return;
-  }
-
-  const existsPosts = await Posts.find({ _id: postId });
-  const result = existsPosts.map((val) => {
-    const postData = {
-      // eslint-disable-next-line no-underscore-dangle
-      postId: val._id,
-      user: val.user,
-      title: val.title,
-      content: val.content,
-      createAt: val.createAt,
-    };
-    return postData;
-  });
-
-  if (existsPosts.length) {
-    res.json({ data: result });
   }
 });
 
@@ -51,40 +46,61 @@ router.post('/', async (req, res) => {
     user, password, title, content,
   } = req.body;
 
-  const createPosts = await Posts.create({
+  if (!(user && password && title && content)) {
+    res.status(400).json({ message: '데이터 형식이 올바르지 않습니다.' });
+    return;
+  }
+
+  await Posts.create({
     user, password, title, content,
   });
 
-  return res.json({ result: 'success', posts: createPosts });
+  res.status(201).json({ message: '게시글을 생성하였습니다.' });
 });
 
+// 게시글 수정
 router.put('/:postId', async (req, res) => {
   const { postId } = req.params;
-
-  const existsPosts = await Posts.find({ _id: postId });
-  const pswrd = existsPosts.map((pw) => pw.password);
-
   const { password, title, content } = req.body;
 
-  if (existsPosts.length && Number(pswrd) === Number(password)) {
-    await Posts.updateOne({ _id: postId }, { $set: { title, content } });
-    res.send('');
+  if (!(password && title && content)) {
+    res.status(400).json({ message: '데이터 형식이 올바르지 않습니다.' });
+    return;
   }
-  // return res.send('얍');
+
+  try {
+    const existsPosts = await Posts.find({ _id: postId });
+    const pswrd = existsPosts.map((pw) => pw.password);
+
+    if (existsPosts.length && String(pswrd) === String(password)) {
+      await Posts.updateOne({ _id: postId }, { $set: { title, content } });
+      res.status(201).json({ message: '게시글을 수정하였습니다.' });
+    }
+  } catch {
+    res.status(404).json({ message: '게시글 조회에 실패하였습니다.' });
+  }
 });
 
 // 게시글 삭제
 router.delete('/:postId', async (req, res) => {
   const { postId } = req.params;
   const { password } = req.body;
-  const existsPosts = await Posts.find({ _id: postId });
-  const pswrd = existsPosts.map((pw) => pw.password);
-
-  if (existsPosts.length && Number(pswrd) === Number(password)) {
-    await Posts.deleteOne({ _id: postId });
+  if (!password) {
+    res.status(400).json({ message: '데이터 형식이 올바르지 않습니다.' });
+    return;
   }
 
-  res.send('');
+  try {
+    const existsPosts = await Posts.find({ _id: postId });
+    const pswrd = existsPosts.map((pw) => pw.password);
+
+    if (existsPosts.length && String(pswrd) === String(password)) {
+      await Posts.deleteOne({ _id: postId });
+    }
+    res.status(201).json({ message: '게시글을 삭제하였습니다.' });
+  } catch {
+    res.status(404).json({ message: '게시글 조회에 실패하였습니다.' });
+  }
 });
 
 module.exports = router;
