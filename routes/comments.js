@@ -39,7 +39,7 @@ router.get('/:postId', async (req, res) => {
     const data = await Comments.find({ postId }).sort({ createdAt: -1 });
     const result = data.map((row) => {
       const commentData = {
-        commentId: row.id, // _id로 받아오면 ObjectId 이고 id로 받아오면 String 왜지.
+        commentsId: row.commentsId, // _id로 받아오면 ObjectId 이고 id로 받아오면 String 왜지.
         user: row.user,
         content: row.content,
         createdAt: new Date(row.createdAt).toLocaleString('ko'),
@@ -67,11 +67,11 @@ router.put('/:commentsId', async (req, res) => {
   }
 
   try {
-    const existsComments = await Comments.find({ _id: commentsId });
+    const existsComments = await Comments.find({ commentsId });
     const pswrd = existsComments.map((row) => row.password);
 
     if (existsComments.length && String(pswrd) === String(password)) {
-      await Comments.updateOne({ _id: commentsId }, { $set: { content } });
+      await Comments.updateOne({ commentsId }, { $set: { content } });
     }
     res.status(201).json({ message: '댓글을 수정하였습니다.' });
   } catch {
@@ -89,11 +89,11 @@ router.delete('/:commentsId', async (req, res) => {
   }
 
   try {
-    const existsComments = await Comments.find({ _id: commentsId });
+    const existsComments = await Comments.find({ commentsId });
     const pswrd = existsComments.map((pw) => pw.password);
 
     if (existsComments.length && String(pswrd) === String(password)) {
-      await Comments.deleteOne({ _id: commentsId });
+      await Comments.deleteOne({ commentsId });
     }
     res.status(201).json({ message: '댓글을 삭제하였습니다.' });
   } catch {

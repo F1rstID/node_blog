@@ -1,6 +1,11 @@
 const mongoose = require('mongoose');
+const AutoIncrement = require('mongoose-sequence')(mongoose);
 
 const commentsSchema = new mongoose.Schema({
+  commentsId: {
+    type: Number,
+    unique: true,
+  },
   postId: {
     type: String,
     require: true,
@@ -22,5 +27,6 @@ const commentsSchema = new mongoose.Schema({
     require: true,
   },
 });
+commentsSchema.plugin(AutoIncrement, { inc_field: 'commentsId' });
 
 module.exports = mongoose.model('Comments', commentsSchema);
