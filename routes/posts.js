@@ -4,7 +4,7 @@ const Posts = require('../schemas/posts');
 const router = express.Router();
 // 게시글 조회
 router.get('/', async (req, res) => {
-  const data = await Posts.find();
+  const data = await Posts.find().sort({ createdAt: -1 });
   const result = data.map((row) => {
     const postData = {
       postId: row.id,
@@ -13,7 +13,7 @@ router.get('/', async (req, res) => {
       createdAt: new Date(row.createdAt).toLocaleString('ko'),
     };
     return postData;
-  }).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
+  });
 
   res.status(200).json({ data: result });
 });
