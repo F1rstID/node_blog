@@ -13,7 +13,7 @@ router.post('/:postId', async (req, res) => {
   const now = new Date();
   const utcNow = now.getTime() + (now.getTimezoneOffset() * 60 * 1000);
   const koreaTimeDiff = 9 * 60 * 60 * 1000;
-  const createdAt = new Date(utcNow + koreaTimeDiff).toLocaleString('ko-KR');
+  const createdAt = new Date(utcNow + koreaTimeDiff);
 
   if (!content) {
     res.json.status(400).json({ message: '댓글 내용을 입력해주세요.' });
@@ -42,7 +42,7 @@ router.get('/:postId', async (req, res) => {
         commentId: row.id, // _id로 받아오면 ObjectId 이고 id로 받아오면 String 왜지.
         user: row.user,
         content: row.content,
-        createdAt: row.createdAt,
+        createdAt: row.createdAt.toLocaleString('ko-KR'),
       };
       return commentData;
     }).sort((a, b) => b.createdAt - a.createdAt);

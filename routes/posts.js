@@ -7,13 +7,13 @@ router.get('/', async (req, res) => {
   const data = await Posts.find();
   const result = data.map((row) => {
     const postData = {
-      postid: row.id,
+      postId: row.id,
       user: row.user,
       title: row.title,
-      createdAt: row.createdAt,
+      createdAt: row.createdAt.toLocaleString('ko-KR'),
     };
     return postData;
-  }).sort((a, b) => a.createdAt - b.createdAt);
+  }).sort((a, b) => b.createdAt - a.createdAt);
 
   res.status(200).json({ data: result });
 });
@@ -29,7 +29,7 @@ router.get('/:postId', async (req, res) => {
         user: row.user,
         title: row.title,
         content: row.content,
-        createdAt: row.createdAt,
+        createdAt: row.createdAt.toLocaleString('ko-KR'),
       };
       return postData;
     });
@@ -50,7 +50,7 @@ router.post('/', async (req, res) => {
   const now = new Date();
   const utcNow = now.getTime() + (now.getTimezoneOffset() * 60 * 1000);
   const koreaTimeDiff = 9 * 60 * 60 * 1000;
-  const createdAt = new Date(utcNow + koreaTimeDiff).toLocaleString('ko-KR');
+  const createdAt = new Date(utcNow + koreaTimeDiff);
 
   if (!(user && password && title && content)) {
     res.status(400).json({ message: '데이터 형식이 올바르지 않습니다.' });
