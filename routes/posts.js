@@ -10,7 +10,7 @@ router.get('/', async (req, res) => {
       postId: row.id,
       user: row.user,
       title: row.title,
-      createdAt: row.createdAt.toLocaleString('ko-KR'),
+      createdAt: row.createdAt.toLocaleString('ko'),
     };
     return postData;
   }).sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt));
@@ -29,7 +29,7 @@ router.get('/:postId', async (req, res) => {
         user: row.user,
         title: row.title,
         content: row.content,
-        createdAt: row.createdAt.toLocaleString('ko-KR'),
+        createdAt: row.createdAt.toLocaleString('ko'),
       };
       return postData;
     });
