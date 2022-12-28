@@ -10,6 +10,11 @@ router.post('/:postId', async (req, res) => {
     user, password, content,
   } = req.body;
 
+  const now = new Date();
+  const utcNow = now.getTime() + (now.getTimezoneOffset() * 60 * 1000);
+  const koreaTimeDiff = 9 * 60 * 60 * 1000;
+  const createdAt = new Date(utcNow + koreaTimeDiff).toLocaleString('ko-KR');
+
   if (!content) {
     res.json.status(400).json({ message: '댓글 내용을 입력해주세요.' });
     return;
@@ -21,7 +26,7 @@ router.post('/:postId', async (req, res) => {
   }
 
   await Comments.create({
-    postId, user, password, content,
+    postId, user, password, content, createdAt,
   });
 
   res.status(201).json({ message: '댓글을 생성하였습니다.' });

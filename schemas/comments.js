@@ -17,6 +17,10 @@ const commentsSchema = new mongoose.Schema({
     type: String,
     require: true,
   },
-}, { timestamps: true, updateAt: true });
+  createdAt: {
+    type: String,
+    require: true,
+  },
+});
 
 module.exports = mongoose.model('Comments', commentsSchema);

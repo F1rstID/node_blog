@@ -47,13 +47,18 @@ router.post('/', async (req, res) => {
     user, password, title, content,
   } = req.body;
 
+  const now = new Date();
+  const utcNow = now.getTime() + (now.getTimezoneOffset() * 60 * 1000);
+  const koreaTimeDiff = 9 * 60 * 60 * 1000;
+  const createdAt = new Date(utcNow + koreaTimeDiff).toLocaleString('ko-KR');
+
   if (!(user && password && title && content)) {
     res.status(400).json({ message: '데이터 형식이 올바르지 않습니다.' });
     return;
   }
 
   await Posts.create({
-    user, password, title, content,
+    user, password, title, content, createdAt,
   });
 
   res.status(201).json({ message: '게시글을 생성하였습니다.' });
