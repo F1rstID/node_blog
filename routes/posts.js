@@ -5,15 +5,12 @@ const router = express.Router();
 // 게시글 조회
 router.get('/', async (req, res) => {
   const data = await Posts.find().sort({ createdAt: -1 });
-  const result = data.map((row) => {
-    const postData = {
-      postId: row.id,
-      user: row.user,
-      title: row.title,
-      createdAt: new Date(row.createdAt).toLocaleString('ko'),
-    };
-    return postData;
-  });
+  const result = data.map((row) => ({
+    postId: row.id,
+    user: row.user,
+    title: row.title,
+    createdAt: new Date(row.createdAt).toLocaleString('ko'),
+  }));
 
   res.status(200).json({ data: result });
 });
@@ -21,24 +18,21 @@ router.get('/', async (req, res) => {
 // 게시글 상세 조회
 router.get('/:postId', async (req, res) => {
   const { postId } = req.params;
-  try {
-    const existsPosts = await Posts.find({ _id: postId });
-    const result = existsPosts.map((row) => {
-      const postData = {
-        postId: row.id,
-        user: row.user,
-        title: row.title,
-        content: row.content,
-        createdAt: new Date(row.createdAt).toLocaleString('ko'),
-      };
-      return postData;
-    });
-    if (existsPosts.length) {
-      res.status(200).json({ data: result });
-    }
-  } catch {
+
+  const existsPosts = await Posts.find({ _id: postId });
+  const result = existsPosts.map((row) => ({
+    postId: row.id,
+    user: row.user,
+    title: row.title,
+    content: row.content,
+    createdAt: new Date(row.createdAt).toLocaleString('ko'),
+  }));
+
+  if (!existsPosts.length) {
     res.status(400).json({ message: '데이터 형식이 올바르지 않습니다.' });
+    return;
   }
+  res.status(200).json({ data: result });
 });
 
 // 게시글 작성
@@ -68,22 +62,22 @@ router.post('/', async (req, res) => {
 router.put('/:postId', async (req, res) => {
   const { postId } = req.params;
   const { password, title, content } = req.body;
+  const existsPosts = await Posts.find({ _id: postId });
+  const pswrd = existsPosts.map((pw) => pw.password);
 
   if (!(password && title && content)) {
     res.status(400).json({ message: '데이터 형식이 올바르지 않습니다.' });
     return;
   }
 
-  try {
-    const existsPosts = await Posts.find({ _id: postId });
-    const pswrd = existsPosts.map((pw) => pw.password);
-
-    if (existsPosts.length && String(pswrd) === String(password)) {
-      await Posts.updateOne({ _id: postId }, { $set: { title, content } });
-      res.status(201).json({ message: '게시글을 수정하였습니다.' });
-    }
-  } catch {
+  if (!existsPosts.length) {
     res.status(404).json({ message: '게시글 조회에 실패하였습니다.' });
+    return;
+  }
+
+  if (existsPosts.length && String(pswrd) === String(password)) {
+    await Posts.updateOne({ _id: postId }, { $set: { title, content } });
+    res.status(201).json({ message: '게시글을 수정하였습니다.' });
   }
 });
 
@@ -91,21 +85,22 @@ router.put('/:postId', async (req, res) => {
 router.delete('/:postId', async (req, res) => {
   const { postId } = req.params;
   const { password } = req.body;
+  const existsPosts = await Posts.find({ _id: postId });
+  const pswrd = existsPosts.map((pw) => pw.password);
+
   if (!password) {
     res.status(400).json({ message: '데이터 형식이 올바르지 않습니다.' });
     return;
   }
 
-  try {
-    const existsPosts = await Posts.find({ _id: postId });
-    const pswrd = existsPosts.map((pw) => pw.password);
-
-    if (existsPosts.length && String(pswrd) === String(password)) {
-      await Posts.deleteOne({ _id: postId });
-    }
-    res.status(201).json({ message: '게시글을 삭제하였습니다.' });
-  } catch {
+  if (existsPosts.length === 0) {
     res.status(404).json({ message: '게시글 조회에 실패하였습니다.' });
+    return;
+  }
+
+  if (String(pswrd) === String(password)) {
+    await Posts.deleteOne({ _id: postId });
+    res.status(201).json({ message: '게시글을 삭제하였습니다.' });
   }
 });
 
