@@ -53,6 +53,14 @@ router.get('/:postId', async (req, res) => {
 
 router.put('/:commentsId', async (req, res) => {
   const { commentsId } = req.params;
+
+  const regExp = /[A-z]/;
+
+  if (regExp.test(commentsId)) {
+    res.status(400).json({ message: '데이터 형식이 올바르지 않습니다.' });
+    return;
+  }
+
   const { password, content } = req.body;
   const commentsData = await Comments.find({ commentsId });
   const pswrd = commentsData.map((row) => row.password);
@@ -72,14 +80,27 @@ router.put('/:commentsId', async (req, res) => {
     return;
   }
 
-  if (commentsData.length && String(pswrd) === String(password)) {
-    await Comments.updateOne({ commentsId }, { $set: { content } });
+  if (String(pswrd) !== String(password)) {
+    res.json.status(400).json({ message: '데이터 형식이 올바르지 않습니다.' });
+    return;
   }
-  res.status(201).json({ message: '댓글을 수정하였습니다.' });
+
+  if (String(pswrd) === String(password)) {
+    await Comments.updateOne({ commentsId }, { $set: { content } });
+    res.status(201).json({ message: '댓글을 수정하였습니다.' });
+  }
 });
 
 router.delete('/:commentsId', async (req, res) => {
   const { commentsId } = req.params;
+
+  const regExp = /[A-z]/;
+
+  if (regExp.test(commentsId)) {
+    res.status(400).json({ message: '데이터 형식이 올바르지 않습니다.' });
+    return;
+  }
+
   const { password } = req.body;
   const commentsData = await Comments.find({ commentsId });
   const pswrd = commentsData.map((pw) => pw.password);
@@ -91,6 +112,10 @@ router.delete('/:commentsId', async (req, res) => {
 
   if (commentsData.length) {
     res.status(404).json({ message: '댓글 조회에 실패하였습니다.' });
+    return;
+  }
+  if (String(pswrd) !== String(password)) {
+    res.json.status(400).json({ message: '데이터 형식이 올바르지 않습니다.' });
     return;
   }
 

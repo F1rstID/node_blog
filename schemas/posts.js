@@ -29,5 +29,4 @@ const postsSchema = new mongoose.Schema({
 });
 
 postsSchema.plugin(AutoIncrement, { inc_field: '_id' });
-
 module.exports = mongoose.model('Posts', postsSchema);

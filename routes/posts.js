@@ -19,6 +19,13 @@ router.get('/', async (req, res) => {
 router.get('/:postId', async (req, res) => {
   const { postId } = req.params;
 
+  const regExp = /[A-z]/;
+
+  if (regExp.test(postId)) {
+    res.status(400).json({ message: '데이터 형식이 올바르지 않습니다.' });
+    return;
+  }
+
   const existsPosts = await Posts.find({ _id: postId });
   const result = existsPosts.map((row) => ({
     postId: row.id,
@@ -60,7 +67,14 @@ router.post('/', async (req, res) => {
 
 // 게시글 수정
 router.put('/:postId', async (req, res) => {
-  const { postId } = req.params;
+  const { postId } = req.params; // 문자열 있으면 예외처리
+  const regExp = /[A-z]/;
+
+  if (regExp.test(postId)) {
+    res.status(400).json({ message: '데이터 형식이 올바르지 않습니다.' });
+    return;
+  }
+
   const { password, title, content } = req.body;
   const existsPosts = await Posts.find({ _id: postId });
   const pswrd = existsPosts.map((pw) => pw.password);
@@ -75,7 +89,12 @@ router.put('/:postId', async (req, res) => {
     return;
   }
 
-  if (existsPosts.length && String(pswrd) === String(password)) {
+  if (String(pswrd) !== String(password)) {
+    res.status(400).json({ message: '데이터 형식이 올바르지 않습니다.' });
+    return;
+  }
+
+  if (String(pswrd) === String(password)) {
     await Posts.updateOne({ _id: postId }, { $set: { title, content } });
     res.status(201).json({ message: '게시글을 수정하였습니다.' });
   }
@@ -84,6 +103,14 @@ router.put('/:postId', async (req, res) => {
 // 게시글 삭제
 router.delete('/:postId', async (req, res) => {
   const { postId } = req.params;
+
+  const regExp = /[A-z]/;
+
+  if (regExp.test(postId)) {
+    res.status(400).json({ message: '데이터 형식이 올바르지 않습니다.' });
+    return;
+  }
+
   const { password } = req.body;
   const existsPosts = await Posts.find({ _id: postId });
   const pswrd = existsPosts.map((pw) => pw.password);
@@ -95,6 +122,11 @@ router.delete('/:postId', async (req, res) => {
 
   if (existsPosts.length === 0) {
     res.status(404).json({ message: '게시글 조회에 실패하였습니다.' });
+    return;
+  }
+
+  if (String(pswrd) !== String(password)) {
+    res.status(400).json({ message: '데이터 형식이 올바르지 않습니다.' });
     return;
   }
 
